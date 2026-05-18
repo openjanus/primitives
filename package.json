@@ -1,0 +1,25 @@
+{
+  "name": "@openjanus/primitives",
+  "version": "0.1.0",
+  "description": "Cryptographic primitives for privacy applications on Flow blockchain",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:integration": "npm run test:integration --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "keywords": ["flow", "blockchain", "cryptography", "zk", "privacy", "babyjub", "pedersen", "groth16"],
+  "author": "oydual3 <claucondor@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
