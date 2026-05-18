@@ -1,0 +1,25 @@
+{
+  "name": "@openjanus/babyjub",
+  "version": "0.1.0",
+  "description": "BabyJubJub EC operations on Flow EVM via modexp precompile",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:integration": "RUN_INTEGRATION=1 vitest run"
+  },
+  "keywords": ["flow", "blockchain", "cryptography", "babyjub", "openjanus", "zk"],
+  "author": "oydual3 <claucondor@gmail.com>",
+  "license": "MIT",
+  "peerDependencies": {
+    "@onflow/fcl": "^1.x"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  },
+  "dependencies": {
+    "ethers": "^6.11.0"
+  }
+}
