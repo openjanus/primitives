@@ -1,0 +1,26 @@
+{
+  "name": "@openjanus/pedersen",
+  "version": "0.1.0",
+  "description": "Pedersen commitments on BabyJubJub via Flow cross-VM — homomorphic balance operations",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:integration": "RUN_INTEGRATION=1 vitest run"
+  },
+  "keywords": ["flow", "blockchain", "cryptography", "pedersen", "babyjub", "commitments", "openjanus"],
+  "author": "oydual3 <claucondor@gmail.com>",
+  "license": "MIT",
+  "peerDependencies": {
+    "@onflow/fcl": "^1.x"
+  },
+  "dependencies": {
+    "@openjanus/babyjub": "^0.1.0",
+    "circomlibjs": "^0.1.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}
