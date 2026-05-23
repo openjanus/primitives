@@ -35,8 +35,8 @@ export const BASE8 = {
 /** Identity element: (0, 1) — neutral element for BabyJubJub addition */
 export const IDENTITY = { x: 0n, y: 1n };
 
-/** Deployed contract address on Flow EVM testnet */
-export const DEPLOYED_ADDRESS = "0x27139AFda7425f51F68D32e0A38b7D43BcB0f870";
+/** Deployed contract address on Flow EVM testnet — canonical openjanus deployment */
+export const DEPLOYED_ADDRESS = "0x2c40513b343B70f2A0B7e6Ad6F997DDa819D6f07";
 
 /** Flow EVM testnet RPC */
 export const FLOW_EVM_TESTNET_RPC = "https://testnet.evm.nodes.onflow.org";
