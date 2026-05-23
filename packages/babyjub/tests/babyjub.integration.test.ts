@@ -4,8 +4,8 @@
  * Integration tests against the deployed BabyJub.sol contract on Flow EVM testnet.
  * Requires live network access to: https://testnet.evm.nodes.onflow.org
  *
- * Contract: 0x27139AFda7425f51F68D32e0A38b7D43BcB0f870 (Flow EVM testnet)
- * Deploy tx: 3dc189b1da6d54cf799b88962587b1f138b2c1c7a83f30abc00c4231331fb905
+ * Contract: 0x2c40513b343B70f2A0B7e6Ad6F997DDa819D6f07 (Flow EVM testnet — openjanus canonical)
+ * Deploy tx: 1d79ef1240b26d4a9982b995f1cdb49f5f9963154f679bfed4bd2c28a1a8cd45
  *
  * Run: RUN_INTEGRATION=1 vitest run tests/babyjub.integration.test.ts
  *
@@ -143,6 +143,6 @@ describe.skipIf(SKIP)("BabyJub.sol integration — 0x27139AFda...0f870", () => {
 describe("deployed address format sanity", () => {
   it("DEPLOYED_ADDRESS is a valid 0x-prefixed 40-char hex address", () => {
     expect(DEPLOYED_ADDRESS).toMatch(/^0x[0-9a-fA-F]{40}$/);
-    expect(DEPLOYED_ADDRESS).toBe("0x27139AFda7425f51F68D32e0A38b7D43BcB0f870");
+    expect(DEPLOYED_ADDRESS).toBe("0x2c40513b343B70f2A0B7e6Ad6F997DDa819D6f07");
   });
 });
