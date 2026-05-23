@@ -1,0 +1,26 @@
+{
+  "name": "@openjanus/groth16",
+  "version": "0.1.0",
+  "description": "Groth16 verifier infrastructure on Flow EVM — BN254 pairing-based ZK proof verification",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:integration": "RUN_INTEGRATION=1 vitest run"
+  },
+  "keywords": ["flow", "blockchain", "cryptography", "groth16", "zk", "bn254", "snarkjs", "openjanus"],
+  "author": "oydual3 <claucondor@gmail.com>",
+  "license": "MIT",
+  "peerDependencies": {
+    "@onflow/fcl": "^1.x"
+  },
+  "dependencies": {
+    "ethers": "^6.11.0",
+    "snarkjs": "^0.7.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}
