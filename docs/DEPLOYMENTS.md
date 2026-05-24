@@ -59,6 +59,23 @@ cast call 0x27139AFda7425f51F68D32e0A38b7D43BcB0f870 \
 #           11563908930482997415800970727888501192209530935490958274440594569809848042842
 ```
 
+## Known issue: ConfidentialTransfer zkey mismatch
+
+The `ConfidentialTransferVerifier.sol` deployed at `0x70FA33...` was compiled from a
+trusted setup that predates the current `setup/verification_key.json` in the private lab.
+The delta constants in the deployed contract do not match the current `verification_key.json`.
+
+**Impact**: Proofs generated with the current `confidential_transfer_final.zkey` will NOT
+verify against the deployed contract. To generate valid proofs for the deployed contract,
+a new proof must be generated with the matching zkey (from the original deployment).
+
+**Workaround**: The contract IS functional — it correctly rejects invalid proofs and would
+accept proofs generated with the matching zkey. The unit tests (pi_b swap, public signal
+parsing) pass. The integration test suite documents this blocker.
+
+**Resolution**: Redeploy the verifier with the current zkey's delta constants, or recover
+the original zkey. This is tracked as a known blocker for full integration test coverage.
+
 ## Gas measurements (empirical, Flow EVM testnet)
 
 | Contract | Function | Gas | Notes |
