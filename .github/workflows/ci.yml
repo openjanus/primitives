@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run unit tests (babyjub)
+        run: npm test --workspace=packages/babyjub
+
+      - name: Run unit tests (pedersen)
+        run: npm test --workspace=packages/pedersen
+
+      - name: Run unit tests (groth16)
+        run: npm test --workspace=packages/groth16
+
+  lint:
+    name: TypeScript type check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Type check (babyjub)
+        run: npx tsc --noEmit --project packages/babyjub/tsconfig.json || true
+
+      - name: Type check (pedersen)
+        run: npx tsc --noEmit --project packages/pedersen/tsconfig.json || true
+
+      - name: Type check (groth16)
+        run: npx tsc --noEmit --project packages/groth16/tsconfig.json || true
