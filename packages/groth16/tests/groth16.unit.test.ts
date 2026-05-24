@@ -129,7 +129,7 @@ describe("pubSignalsToArray", () => {
 describe("deployed address constants", () => {
   it("VERIFIER_ADDRESS is a 0x-prefixed 40-char hex string", () => {
     expect(VERIFIER_ADDRESS).toMatch(/^0x[0-9a-fA-F]{40}$/);
-    expect(VERIFIER_ADDRESS).toBe("0x70FA331534619DBd4051b22b7fb19e647be141b0");
+    expect(VERIFIER_ADDRESS).toBe("0x0085F286d89af79EC59E27CD0c5CcD1c55f42Cf5");
   });
 
   it("VERIFY_PROOF_SELECTOR is 0xf398789b", () => {

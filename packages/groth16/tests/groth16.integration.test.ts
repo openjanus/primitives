@@ -2,7 +2,7 @@
  * groth16.integration.test.ts
  *
  * Integration tests for ConfidentialTransferVerifier.sol on Flow EVM testnet.
- * Deployed at: 0x70FA331534619DBd4051b22b7fb19e647be141b0
+ * Deployed at: 0x0085F286d89af79EC59E27CD0c5CcD1c55f42Cf5 (openjanus canonical — compiled from current zkey)
  *
  * These tests generate a real Groth16 proof using snarkJS and verify it
  * against the live deployed contract on Flow EVM testnet.
@@ -102,7 +102,7 @@ async function generateProof(
 // Tests
 // ---------------------------------------------------------------------------
 
-describe.skipIf(SKIP)("ConfidentialTransferVerifier integration — 0x70FA33...", () => {
+describe.skipIf(SKIP)("ConfidentialTransferVerifier integration — 0x0085F2... (openjanus canonical)", () => {
   let proof: SnarkJSProof;
   let publicSignals: string[];
   let vk: object;
@@ -140,7 +140,7 @@ describe.skipIf(SKIP)("ConfidentialTransferVerifier integration — 0x70FA33..."
     });
   });
 
-  describe("on-chain verification — 0x70FA331534619DBd4051b22b7fb19e647be141b0", () => {
+  describe("on-chain verification — 0x0085F286d89af79EC59E27CD0c5CcD1c55f42Cf5 (openjanus canonical)", () => {
     it("valid proof returns true from live contract", async () => {
       const onChainValid = await verifyOnChain(proof, publicSignals);
       expect(onChainValid).toBe(true);
@@ -189,6 +189,6 @@ describe.skipIf(SKIP)("ConfidentialTransferVerifier integration — 0x70FA33..."
 // Always-run
 describe("verifier address constant", () => {
   it("VERIFIER_ADDRESS matches expected deployment", () => {
-    expect(VERIFIER_ADDRESS).toBe("0x70FA331534619DBd4051b22b7fb19e647be141b0");
+    expect(VERIFIER_ADDRESS).toBe("0x0085F286d89af79EC59E27CD0c5CcD1c55f42Cf5");
   });
 });
