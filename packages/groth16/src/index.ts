@@ -12,8 +12,8 @@
 // Deployed addresses
 // ---------------------------------------------------------------------------
 
-/** ConfidentialTransferVerifier.sol on Flow EVM testnet */
-export const VERIFIER_ADDRESS = "0x70FA331534619DBd4051b22b7fb19e647be141b0";
+/** ConfidentialTransferVerifier.sol on Flow EVM testnet — canonical openjanus deployment */
+export const VERIFIER_ADDRESS = "0x0085F286d89af79EC59E27CD0c5CcD1c55f42Cf5";
 
 /** Flow EVM testnet RPC */
 export const FLOW_EVM_TESTNET_RPC = "https://testnet.evm.nodes.onflow.org";
