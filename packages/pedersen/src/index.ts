@@ -14,11 +14,11 @@ import { negatePoint, CURVE_P, type BabyJubPoint } from "@openjanus/babyjub";
 // Deployed addresses
 // ---------------------------------------------------------------------------
 
-/** PedersenBabyJub.cdc on Flow Cadence testnet */
-export const PEDERSEN_CADENCE_ADDRESS = "0x7599043aea001283";
+/** PedersenBabyJub.cdc on Flow Cadence testnet — canonical openjanus deployment */
+export const PEDERSEN_CADENCE_ADDRESS = "0x28fef3d1d6a12800";
 
-/** BabyJub.sol on Flow EVM testnet (used by the Cadence contract) */
-export const BABYJUB_EVM_ADDRESS = "0x27139AFda7425f51F68D32e0A38b7D43BcB0f870";
+/** BabyJub.sol on Flow EVM testnet — canonical openjanus deployment (used by the Cadence contract) */
+export const BABYJUB_EVM_ADDRESS = "0x2c40513b343B70f2A0B7e6Ad6F997DDa819D6f07";
 
 /** Flow testnet access node */
 export const FLOW_TESTNET_ACCESS_NODE = "https://rest-testnet.onflow.org";
