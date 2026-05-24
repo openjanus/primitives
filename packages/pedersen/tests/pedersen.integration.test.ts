@@ -3,8 +3,8 @@
  *
  * Integration tests for PedersenBabyJub.cdc against live Flow testnet.
  *
- * Tests the deployed contract at 0x7599043aea001283 via FCL scripts.
- * The contract wraps BabyJub.sol at 0x27139AFda7425f51F68D32e0A38b7D43BcB0f870.
+ * Tests the deployed contract at 0x28fef3d1d6a12800 via FCL scripts (openjanus canonical).
+ * The contract wraps BabyJub.sol at 0x2c40513b343B70f2A0B7e6Ad6F997DDa819D6f07.
  *
  * Run: RUN_INTEGRATION=1 vitest run tests/pedersen.integration.test.ts
  *
@@ -53,7 +53,7 @@ async function executeScript(
 const G_X = 5299619240641551281634865583518297030282874472190772894086521144482721001553n;
 const G_Y = 16950150798460657717958625567821834550301663161624707787222815936182638968203n;
 
-describe.skipIf(SKIP)("PedersenBabyJub.cdc integration — 0x7599043aea001283", () => {
+describe.skipIf(SKIP)("PedersenBabyJub.cdc integration — 0x28fef3d1d6a12800 (openjanus canonical)", () => {
   describe("identity()", () => {
     it("returns {x: 0, y: 1} from live contract", async () => {
       const result = await executeScript(SCRIPT_IDENTITY) as {x: string, y: string};
@@ -152,6 +152,6 @@ describe.skipIf(SKIP)("PedersenBabyJub.cdc integration — 0x7599043aea001283", 
 // Always-run checks
 describe("pedersen deployed address format", () => {
   it("PEDERSEN_CADENCE_ADDRESS matches expected testnet address", () => {
-    expect(PEDERSEN_CADENCE_ADDRESS).toBe("0x7599043aea001283");
+    expect(PEDERSEN_CADENCE_ADDRESS).toBe("0x28fef3d1d6a12800");
   });
 });
