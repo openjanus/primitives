@@ -1,0 +1,57 @@
+{
+  "network": "Flow EVM testnet + Flow Cadence testnet",
+  "chainId": 545,
+  "evm": {
+    "rpc": "https://testnet.evm.nodes.onflow.org",
+    "contracts": {
+      "BabyJub": {
+        "address": "0x27139AFda7425f51F68D32e0A38b7D43BcB0f870",
+        "deployTx": "3dc189b1da6d54cf799b88962587b1f138b2c1c7a83f30abc00c4231331fb905",
+        "abi": [
+          "function babyAdd(uint256 x1, uint256 y1, uint256 x2, uint256 y2) view returns (uint256 x3, uint256 y3)",
+          "function isOnCurve(uint256 x, uint256 y) pure returns (bool)",
+          "function identity() pure returns (uint256 x, uint256 y)",
+          "function negate(uint256 x, uint256 y) pure returns (uint256 nx, uint256 ny)"
+        ],
+        "selectors": {
+          "babyAdd": "0xa54a0868",
+          "isOnCurve": "0x2db10fcb",
+          "identity": "0x2e7fa523",
+          "negate": "0x15fa6dfb"
+        }
+      },
+      "ConfidentialTransferVerifier": {
+        "address": "0x70FA331534619DBd4051b22b7fb19e647be141b0",
+        "deployTx": "4bd009caa17e774d95fcb9ffd0c13cf16191fee390a6578bf1b9b49f4c0b02f9",
+        "abi": [
+          "function verifyProof(uint256[2] calldata _pA, uint256[2][2] calldata _pB, uint256[2] calldata _pC, uint256[6] calldata _pubSignals) view returns (bool)"
+        ],
+        "selectors": {
+          "verifyProof": "0xf398789b"
+        },
+        "circuit": {
+          "name": "ConfidentialTransfer v2",
+          "constraints": 7975,
+          "publicInputs": 6,
+          "trustedSetup": "hermez-pot28 phase1 + single-contributor phase2 (EXPERIMENTAL)"
+        }
+      }
+    }
+  },
+  "cadence": {
+    "accessNode": "https://rest-testnet.onflow.org",
+    "contracts": {
+      "PedersenBabyJub": {
+        "address": "0x7599043aea001283",
+        "babyJubHelperAddress": "0x27139AFda7425f51F68D32e0A38b7D43BcB0f870",
+        "api": [
+          "fun addCommits(c1, c2, coa) -> {String: UInt256}",
+          "fun subCommits(c1, c2, coa) -> {String: UInt256}",
+          "view fun identity() -> {String: UInt256}",
+          "view fun negate(point) -> {String: UInt256}",
+          "view fun isIdentity(point) -> Bool"
+        ]
+      }
+    }
+  }
+}
