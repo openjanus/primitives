@@ -4,13 +4,28 @@ Cryptographic primitives for privacy applications on Flow blockchain.
 
 This monorepo provides production-ready building blocks for zero-knowledge and commitment-based privacy systems running on [Flow](https://flow.com) — specifically targeting the unique cross-VM architecture where Cadence transactions call into Flow EVM atomically.
 
-## Packages
+## SDK
+
+The TypeScript SDKs for these primitives have been consolidated into [`@openjanus/sdk`](https://github.com/openjanus/sdk).
+
+```bash
+npm install @openjanus/sdk
+```
+
+```typescript
+import { primitives } from "@openjanus/sdk";
+// primitives.babyjub, primitives.pedersen, primitives.groth16
+```
+
+This repository now contains only the Cadence and Solidity contracts (non-TypeScript artifacts).
+
+## Packages (contracts only)
 
 | Package | Description | Status |
 |---------|-------------|--------|
-| [`@openjanus/babyjub`](./packages/babyjub/) | BabyJubJub EC operations on Flow EVM | v0.1.0 |
-| [`@openjanus/pedersen`](./packages/pedersen/) | Pedersen commitments on BabyJubJub via cross-VM | v0.1.0 |
-| [`@openjanus/groth16`](./packages/groth16/) | Groth16 verifier infrastructure on Flow EVM | v0.1.0 |
+| [`@openjanus/babyjub`](./packages/babyjub/) | BabyJub.sol — BabyJubJub EC on Flow EVM | v0.1.0 |
+| [`@openjanus/pedersen`](./packages/pedersen/) | PedersenBabyJub.cdc — Pedersen on Cadence | v0.1.0 |
+| [`@openjanus/groth16`](./packages/groth16/) | ConfidentialTransferVerifier.sol — Groth16 | v0.1.0 |
 
 ## Why Flow?
 
