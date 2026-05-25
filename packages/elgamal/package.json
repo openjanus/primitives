@@ -1,0 +1,69 @@
+{
+  "name": "@openjanus/elgamal",
+  "version": "0.1.0",
+  "description": "Homomorphic ElGamal encryption on BabyJubjub — additive privacy primitives for Flow EVM",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "circuits/*.circom",
+    "circuits/README.md",
+    "contracts/**/*.sol",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests scripts",
+    "precompute-bsgs": "npx tsx scripts/precompute-bsgs.ts",
+    "precompute-bsgs:48": "npx tsx scripts/precompute-bsgs.ts --bits=48",
+    "generate-setup": "npx tsx scripts/generate-setup.ts",
+    "deploy": "npx tsx scripts/deploy.ts"
+  },
+  "dependencies": {
+    "circomlibjs": "^0.1.7",
+    "snarkjs": "^0.7.6",
+    "ethers": "^6.13.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0",
+    "@vitest/coverage-v8": "^2.0.0",
+    "tsx": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "elgamal",
+    "babyjubjub",
+    "homomorphic",
+    "zk",
+    "groth16",
+    "privacy",
+    "flow",
+    "evm",
+    "circom"
+  ],
+  "license": "MIT",
+  "author": "oydual3 <claucondor@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openjanus/primitives.git",
+    "directory": "packages/elgamal"
+  }
+}

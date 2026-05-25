@@ -1,71 +1,98 @@
-# Architecture
+# OpenJanus Primitives — Architecture
 
 ## Overview
 
-`openjanus/primitives` is designed around Flow's cross-VM execution model. Each primitive exploits the EVM side for expensive cryptographic operations (field inverses, pairings) while keeping Cadence-side logic minimal.
+OpenJanus implements additive privacy for on-chain financial applications using
+exponential ElGamal encryption on the BabyJubjub elliptic curve.
 
-## The cross-VM cost model
+## Cryptographic Design
 
-Flow Cadence transactions have a 9,999 Computation Unit (CU) ceiling. Native Cadence field arithmetic is expensive: a single modular inverse via Fermat's little theorem costs ~47,800 CU — exceeding the entire budget five times over.
+### Exponential ElGamal on BabyJubjub
 
-Flow EVM, running as a sub-execution environment, has no CU constraint. EVM gas is paid separately from Cadence CU. The `coa.call()` dispatch from Cadence costs ~16 CU regardless of EVM gas consumed.
+BabyJubjub is a twisted Edwards curve embedded in the BN254 scalar field,
+making it natively supported by Groth16 circuits (circomlib) and EVM precompiles.
 
-This asymmetry drives all design decisions in this repo:
-
-| Operation | Pure Cadence | Via EVM (cross-VM) |
-|-----------|-------------|---------------------|
-| Modular inverse | ~47,800 CU (not viable) | ~450 gas, ~16 CU dispatch |
-| BabyAdd (2 inverses) | ~95,600 CU (not viable) | ~35k gas, ~16 CU dispatch |
-| Groth16 verify (pairing) | Impossible | ~253k gas, ~2,785 CU dispatch |
-
-## Primitive stack
-
+**Encryption:**
 ```
-ConfidentialTransfer (ZK proof system)
-          │
-          ▼
-@openjanus/groth16 — ConfidentialTransferVerifier.sol
-          │
-          │ uses BabyJubJub Pedersen commitments
-          ▼
-@openjanus/pedersen — PedersenBabyJub.cdc (Cadence)
-          │
-          │ cross-VM calls for point arithmetic
-          ▼
-@openjanus/babyjub — BabyJub.sol (Flow EVM)
-          │
-          │ uses EVM precompiles
-          ▼
-EVM precompiles: modexp (0x05), ecAdd (0x06), ecMul (0x07), bn128pairing (0x08)
+C1 = r * G          (randomness commitment)
+C2 = v*G + r*PK     (masked value)
+```
+where G is the BabyJubjub generator (Base8 in circomlib), r is fresh randomness,
+v is the plaintext value, and PK is the recipient's public key.
+
+**Homomorphism:**
+```
+E(v1,r1) + E(v2,r2) = (C1a+C1b, C2a+C2b) = E(v1+v2, r1+r2)
+```
+Addition is BabyJubjub point addition. No interaction required between senders.
+
+**Decryption:**
+```
+vG = C2 - sk*C1 = v*G + r*PK - sk*(r*G) = v*G  (since PK = sk*G)
+v  = BSGS(vG)   (solve discrete log in [0, 2^32))
 ```
 
-## BabyJub package
+### BSGS Discrete Log Solver
 
-`BabyJub.sol` is a stateless, pure-view contract. All functions are either `pure` (no reads) or `view` (reads only constants). It can be called from:
-- EVM transactions directly (standard Solidity call)
-- Cadence transactions via `coa.call()`
-- Cadence scripts via `EVM.dryCall()` (read-only)
+Baby-step Giant-step with M = sqrt(2^BITS) baby steps:
+- Baby steps: precompute table[j*G] = j for j in [0, M)
+- Giant steps: for i in [0, M): test P - i*(M*G), look up in table
+- Solution: v = i*M + j
 
-The contract uses `mulmod`, `addmod`, and the modexp precompile at address `0x05` for all field arithmetic. No custom big-number library is needed.
+Default: BITS=32, M=2^16=65536 baby steps, O(1MB) table, <1s build.
 
-## Pedersen package
+For 2^48: M=2^24=16.7M baby steps, ~600MB disk table, ~30 min build (once).
 
-`PedersenBabyJub.cdc` is a Cadence contract that provides homomorphic point operations without exposing plaintext values. Commitments are always computed off-chain using `@iden3/circomlibjs`. The contract only handles:
-- `addCommits(c1, c2, coa)` — point addition, dispatched to BabyJub.sol via cross-VM
-- `subCommits(c1, c2, coa)` — negation (pure Cadence) + add (cross-VM)
-- `negate(point)` — pure Cadence (trivially `-x mod p`)
-- `identity()` — returns `(0, 1)`, pure Cadence
-- `isIdentity(point)` — pure Cadence equality check
+### ZK Circuits
 
-## Groth16 package
+**encrypt_consistency**: Sender proves ciphertext is well-formed.
+- Private: value, randomness
+- Public: recipient_pubkey, C1, C2
+- Constraints: ~2,200 (fits in pot11)
 
-`Groth16Verifier.sol` is an abstract base (snarkJS-generated template). The `ConfidentialTransferVerifier.sol` is the concrete implementation for the confidential transfer circuit. It uses:
-- BN254 `ecAdd` precompile (0x06) for G1 linear combination
-- BN254 `ecMul` precompile (0x07) for scalar multiplication
-- BN254 `bn128pairing` precompile (0x08) for the final pairing check
+**decrypt_open**: Recipient proves correct decryption without revealing privkey.
+- Private: privkey
+- Public: pubkey, C1, C2, claimed_value
+- Constraints: ~3,500 (fits in pot12)
 
-The critical implementation detail is the **pi_b Fp2 swap**: snarkJS emits `pi_b` in `(real, imaginary)` order, but EIP-197 expects `(imaginary, real)`. Callers must swap before submitting.
+### Key Derivation
 
-## Flow testnet addresses
+From a Flow signing key using HKDF-SHA256:
+```
+PRK = HMAC-SHA256(salt="openjanus-privacy-v1", IKM=flowKey)
+OKM = HMAC-SHA256(PRK, info="babyjub-privkey" || 0x01)
+privkey = OKM mod BabyJubjub.subOrder
+```
 
-See [DEPLOYMENTS.md](./DEPLOYMENTS.md).
+This allows each Flow user to derive a deterministic BabyJubjub keypair from
+their existing Flow signing key without managing a separate seed.
+
+## Contract Architecture
+
+```
+ElGamalAccumulator.sol
+  ├── registerPubkey(x, y)          — one-time, stores BabyJubjub pubkey
+  ├── accumulate(recipient, ct)     — homomorphic add to slot
+  └── getSlot(recipient)            — read accumulated ciphertext
+
+EncryptConsistencyVerifier.sol      — Groth16, 6 public signals
+DecryptOpenVerifier.sol             — Groth16, 7 public signals
+BabyJub.sol (external)             — curve ops: babyAdd, isOnCurve, negate
+```
+
+## Phase Roadmap
+
+| Phase | Status | Focus |
+|-------|--------|-------|
+| L1 (lab spike) | DONE (2026-05-25) | ElGamal on BabyJubjub, 17/17 tests PASS |
+| L2 (this) | IN PROGRESS | Extract to @openjanus/elgamal, production BSGS, CI |
+| L3 (contracts) | PLANNED | Per-user COA, ZK-gated accumulate, replay protection |
+| L4 (integration) | PLANNED | Cadence CrossVM, key management, SDK |
+
+## Security Notes
+
+- IND-CPA security under DDH on BabyJubjub (standard assumption)
+- NOT post-quantum secure
+- Trusted setup required for Groth16 (see circuits/README.md for ceremony chain)
+- The `resetSlot()` function in Phase 1 contracts must be REMOVED in production
+- Nonce/replay protection must be added before production use
