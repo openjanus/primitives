@@ -1,0 +1,148 @@
+# Architecture
+
+## Overview
+
+The UTXO pool uses three interconnected systems:
+1. **Circuits** — Groth16 ZK proofs (circomlib, BN254)
+2. **Contracts** — EVM pool + Groth16 verifiers + Poseidon
+3. **Off-chain** — Note management, Merkle tree, proof generation
+
+## Note Lifecycle
+
+```
+                   Cadence Layer              EVM Layer
+                   (FLOW custody)             (ZK verification)
+                        │                          │
+ User                   │                          │
+  │── createNote() ─────┤                          │
+  │   (amount, ns, b)   │                          │
+  │                     │                          │
+  │── proveShield() ────┤                          │
+  │   → commitment      │                          │
+  │   → proof           │                          │
+  │                     │                          │
+  │── Cadence TX ───────┼──── coa.call ────────────┤
+  │   (lock FLOW)       │   shield(proof, commit)  │
+  │                     │   → insertLeaf()         │
+  │                     │   → Shielded event       │
+  │                     │                          │
+  │   (save leafIndex from Shielded event)          │
+  │                     │                          │
+  │── proveTransfer() ──┤                          │
+  │   (requires path)   │                          │
+  │── transfer() ───────┼──────────────────────────┤
+  │   (any EOA)         │   (no FLOW moves)        │
+  │                     │   → mark nullifier spent  │
+  │                     │   → insertLeaf()          │
+  │                     │                          │
+  │── proveUnshield() ──┤                          │
+  │── Cadence TX ───────┼──── coa.call ────────────┤
+  │   (after EVM call)  │   unshield(proof, ...)   │
+  │   release FLOW      │   → mark nullifier spent  │
+```
+
+## Commitment Scheme
+
+```
+commitment = Poseidon(amount, nullifier_secret, blinding)
+              ↑ 3-input Poseidon (t=4 circuit, t=3 on-chain approximation)
+```
+
+The commitment is deterministic from the note secrets but reveals nothing
+about amount, secret, or blinding independently.
+
+```
+nullifier_hash = Poseidon(nullifier_secret, leaf_index)
+                  ↑ 2-input Poseidon (t=3, same as Merkle hash)
+```
+
+The nullifier is computed only at spend time (transfer or unshield).
+An observer cannot link a commitment to its future nullifier without knowing `nullifier_secret`.
+
+## Merkle Tree
+
+Incremental Merkle tree (Tornado Cash style):
+- Depth 8 → 256 leaves max
+- Hash function: Poseidon(2) at each level
+- Zero subtrees: `zeros[0] = 0`, `zeros[i] = Poseidon(zeros[i-1], zeros[i-1])`
+- `filledSubtrees[i]` = last left-side hash at level `i`
+- Historical roots: every root after insertion is stored for proof freshness
+
+```
+         root (zeros[8])
+        /               \
+    zeros[7]           zeros[7]
+    /     \
+zeros[6]  zeros[6]
+ /    \
+...
+leaf_0   leaf_1   zeros[0]  zeros[0]  ...
+```
+
+## Circuit Constraints
+
+### shield.circom (~270 constraints)
+1. `Num2Bits(48)`: amount range check
+2. `Poseidon(3)`: commitment computation
+3. Equality: `commitment === public_commitment`
+4. Equality: `public_amount === amount`
+
+### transfer.circom (~2400 constraints)
+1. `Poseidon(3)`: old commitment
+2. `MerklePathDepth8()`: 8x `Poseidon(2)` + binary constraint per level
+3. `Poseidon(2)`: old nullifier hash
+4. `Poseidon(3)`: new commitment
+
+### unshield.circom (~2200 constraints)
+1. `Poseidon(3)`: commitment
+2. `MerklePathDepth8()`: 8x `Poseidon(2)` + binary constraint
+3. `Poseidon(2)`: nullifier hash
+4. Equality: `public_amount === amount`
+5. Signal bind: `recipient` signal touched to include in proof
+
+## Security Model
+
+### On-chain enforcement
+- Nullifier registry prevents double-spend
+- Historical root check prevents stale-root fabrication
+- `cadenceCOAAddress` guard prevents unauthorized FLOW release (shield/unshield)
+- Transfer is permissionless (no FLOW moves, only EVM state change)
+
+### Off-chain assumptions
+- Note holder keeps `nullifier_secret` private
+- Prover picks random `blinding` to prevent commitment bruteforcing
+- Off-chain Merkle tree state must be in sync with on-chain events
+
+### Known limitations (spike)
+- Depth 8 (256 notes max) — not production scale
+- No relayer (unshield caller can be observed)
+- Amount revealed on unshield
+- Single-contributor trusted setup
+- No access control beyond COA address check
+
+## vuln #012 — Hand-written Yul Poseidon
+
+The on-chain Poseidon contracts (PoseidonT3/T4) are hand-written Yul.
+Hand-written Yul Poseidon implementations have historically produced
+incorrect hashes for some inputs. Always verify:
+
+```
+PoseidonT3([0, 0]) === 0x2098f5fb9e239eab3ceac3f27b81e481dc3124d55ffed523a839ee8446b64864
+```
+
+For fresh deployments, use `circomlibjs.poseidonContract.createCode(N)` instead.
+
+## vuln #013 — Fixed-size calldata arrays
+
+Groth16 verifiers generated by snarkjs use fixed-size calldata arrays:
+```solidity
+function verifyProof(..., uint[2] calldata pubSignals)  // shield
+function verifyProof(..., uint[3] calldata pubSignals)  // transfer
+function verifyProof(..., uint[4] calldata pubSignals)  // unshield
+```
+
+Using `uint[] calldata` (dynamic) silently breaks ABI encoding — proofs always
+return false without any error. UTXOPool.sol uses per-circuit typed interfaces
+(IShieldVerifier, ITransferVerifier, IUnshieldVerifier) to prevent this.
+
+See `contracts/interfaces/IGroth16VerifierFixed.sol` for documentation.

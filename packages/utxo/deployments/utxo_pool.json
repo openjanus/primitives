@@ -1,0 +1,32 @@
+{
+  "network": "flow-evm-testnet",
+  "chain_id": 545,
+  "deployed_at": "2026-05-25T16:31:23.133Z",
+  "deployer_coa": "0x000000000000000000000002b7557ee5d4a32d06",
+  "contracts": {
+    "PoseidonT3": {
+      "address": "0xAA31b4EE06282d2580550C25dC32B5EAF0712F1E",
+      "deploy_tx": "2c6478c71c8403502d9ac4cf02ce594f9e6e4cf873ad6906ab79736fcead4796"
+    },
+    "PoseidonT4": {
+      "address": "0xda71Ba9ecAb56dAa64fEc9CD6fC2a8782862CF25",
+      "deploy_tx": "a974c99cfcf92edfc965aed09d55bb05562938b331e902775c65cc17cd30af26"
+    },
+    "ShieldVerifier": {
+      "address": "0xCDfc8496C28a6d7e931C2A4FC95709381A43365D",
+      "deploy_tx": "f30fb31e8776c80c35c6d38cac4d75391bd8f6c6befbbc5d407508b9fe5fbd6c"
+    },
+    "TransferVerifier": {
+      "address": "0x25bd550F8fE81A0A9f5bf43a0BCf40152F9C4674",
+      "deploy_tx": "24c40f6507f2fd68896ff65622651e6e8a5556eb0617f17a56a5b5e5f40039af"
+    },
+    "UnshieldVerifier": {
+      "address": "0xbe5449F55D1edb695aA08a5cee34885AcD60DC50",
+      "deploy_tx": "0b575032023b13d2d8c15bc5a99364544295a352984e62ec2e78a2f97a950cf6"
+    },
+    "UTXOPool": {
+      "address": "0x6c1c172068f8325bd1f6564bc2fBa5B0A9BB1725",
+      "deploy_tx": "80ed2cda6d7906189511cb9d89042e38dcf78665b208f5d8f550a8d2bf38c902"
+    }
+  }
+}
