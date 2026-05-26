@@ -1,5 +1,23 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- `@openjanus/elgamal` package now ships with proper trusted setup ceremony
+  (Hermez phase 1 pot14, 200+ contributors + Flow VRF beacon entropy applied at
+  phase 2 contribution step). Closes the audit gap from the single-contributor
+  lab setup used in v0.1.0.
+- `packages/elgamal/circuits/setup/` now includes ceremony-backed zkeys and
+  vkeys: `encrypt_consistency_final.zkey`, `decrypt_open_final.zkey`,
+  `encrypt_consistency_vkey.json`, `decrypt_open_vkey.json`.
+- SHA256 encrypt zkey: `17ab9353f2966336bbf380549a47721ccce4283f20000380e18ecab763c3da16`
+- SHA256 decrypt zkey: `d87eda3b96f2eeab11f33583369519d041d25915cdbd49cedf41fd269b8e0745`
+- Ceremony beacon: Flow testnet block 323555648,
+  hash `30f1f68eed7ea6e7b4964e798ff8a0e2b77e7ca073ed80ac44d39ddc5fb395e7`
+- `docs/DEPLOYMENTS.md` updated to v0.2.0 canonical addresses for JanusToken
+  stack. Old single-contributor v0.1.0 addresses marked DEPRECATED.
+
 ## v0.1.0 (2026-05-24)
 
 ### @openjanus/babyjub
