@@ -83,16 +83,21 @@ console.log(total); // 42n
 
 Gas figures from Phase 1 testnet results (2026-05-25).
 
-## Deployed Contracts (Flow EVM Testnet)
+## Deployed Contracts — v0.2.0 (Flow EVM Testnet, ceremony-backed)
+
+Trusted setup: Hermez pot14 (200+ contributors) + Flow VRF beacon
+(testnet block 323555648). E2E: 27/27 PASS (2026-05-26).
 
 | Contract | Address |
 |----------|---------|
 | BabyJub.sol | `0x27139AFda7425f51F68D32e0A38b7D43BcB0f870` |
-| ElGamalAccumulator | `0x808560A5cAc9BcC5C7D2FC128A05b879f7454C0A` |
-| EncryptConsistencyVerifier | `0x6F8Cc93dd6aA7B3ED0a3DaA75271815558ad9b5C` |
-| DecryptOpenVerifier | `0x3bB139B5404fD6b152813bC3532367AAa096638b` |
+| JanusToken (ElGamal accumulator) | `0xb12E600fFcde967210cFD81CF9f32bBB6e68a499` |
+| EncryptConsistencyVerifier | `0x0C1e731036f4632CF9620bf6C6BB8204eD3a3B1e` |
+| DecryptOpenVerifier | `0x1c248dA94aab9f4A03005E7944a8b745a6236Dbc` |
 
-These are Phase 1 lab contracts (testnet-grade setup). Phase 3 will deploy production contracts with Hermez-beaconed setup.
+> **DEPRECATED — v0.1.0 addresses (single-contributor lab setup — DO NOT USE):**
+> EncryptConsistencyVerifier `0x6F8Cc93dd6aA7B3ED0a3DaA75271815558ad9b5C`,
+> DecryptOpenVerifier `0x3bB139B5404fD6b152813bC3532367AAa096638b`
 
 ## BSGS Precompute (Production 2^48)
 
